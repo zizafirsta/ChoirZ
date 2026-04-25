@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
 
-  // Reset error message saat user mengetik ulang agar UI bersih
   useEffect(() => {
     if (errorMessage) setErrorMessage("");
   }, [email, password]);
@@ -21,43 +20,25 @@ export default function LoginPage() {
     setErrorMessage("");
 
     try {
-      // 1. Proses Login ke Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (authError) {
-        throw new Error(authError.message);
-      }
+      if (authError) throw new Error(authError.message);
+      if (!authData?.user) throw new Error("User data tidak ditemukan.");
 
-      if (!authData?.user) {
-        throw new Error("User data tidak ditemukan di sistem autentikasi.");
-      }
-
-      // 2. Ambil Role dari tabel 'profiles' berdasarkan UID
-      // Di sini kita melakukan pengecekan data yang Anda masukkan manual di Table Editor
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", authData.user.id)
         .single();
 
-      if (profileError) {
-        console.error("Detail Error Supabase:", profileError);
-        // Error ini biasanya terjadi jika UUID di tabel 'profiles' tidak cocok dengan di 'auth.users'
-        throw new Error(`Profil tidak ditemukan (Error: ${profileError.code}). Pastikan UUID di tabel profiles sudah benar.`);
-      }
+      if (profileError) throw new Error(`Profil tidak ditemukan (Error: ${profileError.code}).`);
 
-      // 3. Redirect berdasarkan Role
       const targetPath = profileData.role === "admin" ? "/admin/dashboard" : "/member/dashboard";
-      
-      console.log("Login sukses! Role:", profileData.role, "Mengarahkan ke:", targetPath);
-      
-      // Gunakan router.push untuk pengalaman SPA, dan window.location sebagai cadangan
       router.push(targetPath);
       
-      // Fallback: Jika dalam 1.5 detik halaman tidak pindah, paksa dengan window.location
       setTimeout(() => {
         window.location.href = targetPath;
       }, 1500);
@@ -69,68 +50,111 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 font-sans">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg border border-gray-200">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-extrabold text-blue-600 tracking-tight">ChoirZ</h1>
-          <p className="mt-2 text-sm text-gray-500 italic">Integrated Choir Operating System</p>
-        </div>
+    <div className="min-h-screen bg-[#f5f7fa] flex items-center justify-center p-4 font-sans text-slate-900">
+      <div className="w-full max-w-[440px] bg-white rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 p-10 md:p-12 overflow-hidden relative">
         
-        {/* Pesan Error Alert */}
+        {/* Dekorasi Aksen Halus */}
+        <div className="absolute top-0 left-0 w-full h-2 bg-[#3b82f6]"></div>
+
+{/* Logo & Header */}
+<div className="text-center mb-10">
+  <div className="inline-block mb-6 transition-transform hover:scale-105 duration-300">
+    {/* Coba muat gambar, jika gagal tampilkan teks logo */}
+    <img 
+      src="/logo.png" 
+      alt="ChoirZ" 
+      className="h-20 w-auto mx-auto object-contain"
+      onError={(e) => {
+        e.target.style.display = 'none'; // Sembunyikan gambar jika error
+        e.target.nextSibling.style.display = 'block'; // Munculkan teks cadangan
+      }}
+    />
+    <h1 
+      className="hidden text-4xl font-black tracking-tighter text-blue-600"
+      style={{ display: 'none' }}
+    >
+      ChoirZ
+    </h1>
+  </div>
+  <h1 className="text-2xl font-black tracking-tight text-slate-900 mb-2">
+    Selamat Datang
+  </h1>
+  <p className="text-sm font-medium text-slate-400">
+    Masuk untuk mengakses sistem paduan suara
+  </p>
+</div>
+
+        {/* Alert Error Modern */}
         {errorMessage && (
-          <div className="mb-6 rounded-md bg-red-50 p-3 text-sm text-red-600 border border-red-200 animate-pulse">
-            <strong>Gagal: </strong> {errorMessage}
+          <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-100 p-4 rounded-2xl animate-in fade-in slide-in-from-top-2">
+            <span className="text-red-500 mt-0.5">⚠️</span>
+            <p className="text-xs font-bold text-red-600 leading-relaxed">
+              {errorMessage}
+            </p>
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Email ChoirZ</label>
+        <form onSubmit={handleLogin} className="space-y-6">
+          {/* Input Email */}
+          <div className="space-y-2">
+            <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">
+              Email Address
+            </label>
             <input
               type="email"
+              required
               placeholder="nama@email.com"
-              className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white font-bold transition-all placeholder:text-slate-300 text-sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+
+          {/* Input Password */}
+          <div className="space-y-2">
+            <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">
+              Password
+            </label>
             <input
               type="password"
+              required
               placeholder="••••••••"
-              className="w-full rounded-lg border border-gray-300 p-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 focus:bg-white font-bold transition-all placeholder:text-slate-300 text-sm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
           </div>
-          
+
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className={`w-full rounded-lg py-3 font-bold text-white shadow-md transition-all ${
-              loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 active:scale-95"
+            className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg transition-all flex items-center justify-center gap-3 ${
+              loading 
+                ? "bg-slate-200 text-slate-400 cursor-not-allowed shadow-none" 
+                : "bg-[#3b82f6] hover:bg-blue-700 text-white shadow-blue-200 active:scale-[0.98]"
             }`}
           >
             {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+              <>
+                <svg className="animate-spin h-4 w-4 text-slate-400" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
                 Menghubungkan...
-              </span>
+              </>
             ) : (
               "Masuk ke Dashboard"
             )}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-xs text-gray-400">
-          © 2026 ChoirZ Platform • v1.0-beta
-        </p>
+        {/* Footer */}
+        <div className="mt-12 text-center">
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+            © 2026 ChoirZ • v1.0 Beta
+          </p>
+        </div>
       </div>
     </div>
   );
