@@ -326,6 +326,22 @@ export default function MemberDashboard() {
               </div>
             )}
           </section>
+
+          {/* SECTION GAMBAR BARU */}
+          <section className="pt-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {['choir4.png', 'choir5.png', 'choir6.png'].map((img, index) => (
+                <div key={index} className="group overflow-hidden rounded-[40px] bg-white p-3 shadow-sm border border-white hover:shadow-xl transition-all duration-500">
+                  <img 
+                    src={`/${img}`} 
+                    alt={`Choir Activity ${index + 4}`} 
+                    className="w-full h-64 object-cover rounded-[32px] group-hover:scale-105 transition-transform duration-700"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+
         </div>
       </div>
 
@@ -362,10 +378,8 @@ function InfoBadge({ icon, text }) {
 }
 
 function SongCard({ song, voiceType }) {
-  // 1. Normalisasi data dari profil (menghilangkan spasi dan huruf kecil)
   const rawVoice = voiceType ? voiceType.toLowerCase().trim() : "";
 
-  // 2. Mapping Manual: Memastikan input apapun (lengkap/inisial) jadi inisial s/a/t/b
   const getInitial = (v) => {
     if (v === 'sopran' || v === 's') return 's';
     if (v === 'alto' || v === 'a') return 'a';
@@ -376,7 +390,6 @@ function SongCard({ song, voiceType }) {
 
   const initial = getInitial(rawVoice);
 
-  // 3. Mapping Label Tampilan
   const voiceLabelMap = {
     's': 'Sopran',
     'a': 'Alto',
@@ -386,7 +399,6 @@ function SongCard({ song, voiceType }) {
 
   const voiceLabel = voiceLabelMap[initial];
   
-  // 4. Ambil Source Audio dari kolom track_s, track_a, dst.
   const audioKey = initial ? `track_${initial}` : null;
   const audioSrc = audioKey ? song[audioKey] : null;
 
