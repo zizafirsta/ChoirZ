@@ -91,7 +91,6 @@ export default function MemberDashboard() {
   const submitAttendance = async (status) => {
     if (!activities.length || isSubmitting) return;
 
-    // 1. Validasi Alasan (Client-side)
     if (status === 'excused') {
       if (!reason || reason.trim().length < 5) {
         alert("Harap berikan alasan izin yang jelas (minimal 5 karakter).");
@@ -104,8 +103,6 @@ export default function MemberDashboard() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // 2. Gunakan upsert untuk menghindari error duplicate key
-      // Jika sudah ada (event_id & user_id sama), maka akan di-update
       const { error } = await supabase.from("attendance").upsert(
         { 
           event_id: activities[0].id, 
@@ -145,7 +142,6 @@ export default function MemberDashboard() {
   return (
     <div className="min-h-screen font-sans text-slate-900 pb-24 relative overflow-hidden">
       
-      {/* BACKGROUND LAYER */}
       <div className="fixed inset-0 z-0">
         <img 
           src="/choir1.png" 
@@ -156,7 +152,6 @@ export default function MemberDashboard() {
       </div>
 
       <div className="relative z-10">
-        {/* TOP NAVIGATION */}
         <nav className="sticky top-0 z-30 bg-white/70 backdrop-blur-md border-b border-white/20 px-6 py-5">
           <div className="max-w-5xl mx-auto flex justify-between items-center">
             <div className="flex items-center gap-3">
@@ -179,7 +174,6 @@ export default function MemberDashboard() {
 
         <div className="max-w-5xl mx-auto p-6 space-y-8">
           
-          {/* WELCOME SECTION */}
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="bg-white/80 backdrop-blur-sm p-8 rounded-[40px] shadow-sm border border-white flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-4">
               <div>
@@ -198,7 +192,6 @@ export default function MemberDashboard() {
             </div>
           </section>
 
-          {/* ANNOUNCEMENT */}
           {announcement && (
             <div className={`p-6 rounded-[35px] flex items-center gap-5 shadow-xl animate-bounce-subtle ${
               announcement.type === 'warning' ? 'bg-red-600 text-white' : 
@@ -215,7 +208,6 @@ export default function MemberDashboard() {
             </div>
           )}
 
-          {/* MAIN GRID */}
           <section className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 bg-white rounded-[45px] p-10 shadow-sm border border-white relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-10 opacity-[0.03] text-8xl font-black italic group-hover:scale-110 transition-transform pointer-events-none">NEXT</div>
@@ -369,9 +361,40 @@ function InfoBadge({ icon, text }) {
   );
 }
 
+/**
+ * BAGIAN SONG CARD YANG DIPERBAIKI
+ */
 function SongCard({ song, voiceType }) {
-  const voiceLabel = { 'S': 'Sopran', 'A': 'Alto', 'T': 'Tenor', 'B': 'Bass' }[voiceType];
-  const audioSrc = song[`track_${voiceType?.toLowerCase()}`];
+  // Normalisasi voiceType agar tidak sensitif huruf besar/kecil
+  const normalizedVoice = voiceType ? voiceType.toLowerCase().trim() : null;
+
+  // Mapping label tampilan berdasarkan input database
+  const voiceMap = {
+    's': 'Sopran', 
+    'sopran': 'Sopran',
+    'a': 'Alto', 
+    'alto': 'Alto',
+    't': 'Tenor', 
+    'tenor': 'Tenor',
+    'b': 'Bass', 
+    'bass': 'Bass'
+  };
+
+  const voiceLabel = voiceMap[normalizedVoice];
+  
+  // Logika pengambilan kunci audio: track_sopran, track_alto, dsb.
+  // Jika database menyimpan 'S', diubah dulu ke 'sopran' untuk memanggil kolom track
+  const getAudioKey = (v) => {
+    if (!v) return null;
+    if (v === 's' || v === 'sopran') return 'track_sopran';
+    if (v === 'a' || v === 'alto') return 'track_alto';
+    if (v === 't' || v === 'tenor') return 'track_tenor';
+    if (v === 'b' || v === 'bass') return 'track_bass';
+    return null;
+  };
+
+  const audioKey = getAudioKey(normalizedVoice);
+  const audioSrc = audioKey ? song[audioKey] : null;
 
   return (
     <div className="group bg-white/90 backdrop-blur-sm rounded-[50px] p-10 shadow-sm border border-white hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-500 relative overflow-hidden">
@@ -385,7 +408,9 @@ function SongCard({ song, voiceType }) {
             <span className="text-xl group-hover/btn:translate-x-1 transition-transform">📄</span>
           </a>
           <div className="pt-2">
-            {voiceLabel ? <AudioPlayer label={voiceLabel} src={audioSrc} /> : (
+            {voiceLabel ? (
+              <AudioPlayer label={voiceLabel} src={audioSrc} />
+            ) : (
               <div className="p-5 bg-amber-50 text-amber-600 text-[9px] rounded-3xl font-black text-center border border-amber-100">
                 LENGKAPI "JENIS SUARA" DI PROFIL UNTUK AUDIO LATIHAN
               </div>

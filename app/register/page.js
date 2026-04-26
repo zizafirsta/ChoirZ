@@ -49,14 +49,15 @@ export default function RegisterPage() {
           .from("profiles")
           .insert([
             {
-              id: authData.user.id, // Sinkronisasi dengan UUID Auth
+              id: authData.user.id,
               full_name: fullName,
-              role: "member",       // Default role
-              voice_type: voiceType,
-              email: email,
+              role: "member",
+              voice_type: voiceType.toLowerCase(), // Memastikan konsistensi value
+              email: email, 
             },
           ]);
 
+        // Jika error kolom tidak ditemukan tetap muncul, pastikan Anda sudah menjalankan ALTER TABLE di SQL Editor Supabase
         if (profileError) throw new Error(`Gagal menyimpan profil: ${profileError.message}`);
 
         alert("Registrasi Berhasil! Silakan cek email untuk verifikasi atau langsung login.");
