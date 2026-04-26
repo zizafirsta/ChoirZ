@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChoirZ - Integrated Choir Operating System
 
-## Getting Started
+**ChoirZ** adalah sistem informasi operasional yang dirancang khusus untuk mendigitalisasi proses inti dalam kegiatan paduan suara. Berfokus pada efisiensi latihan dan manajemen anggota, platform ini mengintegrasikan distribusi materi vokal secara kontekstual berdasarkan tipe suara (SATB).
 
-First, run the development server:
+**URL Aplikasi:** [https://choir-z.vercel.app/about](https://choir-z.vercel.app/about)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Fitur Utama
+
+* **Company Profile (Landing Page):** Halaman representatif yang menjelaskan visi, misi, dan statistik pencapaian ChoirZ.
+* **Contextual Auth System:** Sistem registrasi dan login yang terintegrasi dengan Supabase Auth dan database PostgreSQL.
+* **Role-Based Access Control (RBAC):**
+    * **Admin:** Memiliki akses penuh terhadap operasional sistem termasuk kendali dashboard (CRUD).
+    * **Member:** Mengakses materi latihan pada modul learning dan dasbor personal.
+* **Smart Material Distribution:** Pendistribusian materi vokal otomatis yang difilter berdasarkan kategori suara anggota (Soprano, Alto, Tenor, Bass).
+
+## Tech Stack
+
+* **Framework:** Next.js 15 (App Router)
+* **Language:** TypeScript & JavaScript
+* **Styling:** Tailwind CSS
+* **Backend & Database:** Supabase (Auth & PostgreSQL)
+* **Deployment:** Vercel
+
+## Struktur Proyek
+
+```text
+├── app/
+│   ├── about/          # Landing Page (Company Profile)
+│   ├── admin/          # Dashboard Admin (CRUD Operations)
+│   ├── member/         # Dashboard Member & Learning Module
+│   ├── login/          # Halaman Autentikasi Login
+│   ├── register/       # Halaman Registrasi Anggota Baru
+│   ├── globals.css     # Konfigurasi Styling Global
+│   └── layout.tsx      # Root Layout Aplikasi
+├── lib/
+│   └── supabaseClient.js # Konfigurasi Koneksi Supabase
+├── public/             # Asset Gambar (Logo, Choir Photos)
+├── .env.local          # Environment Variables (Supabase Keys)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Alur Pengguna (User Journey)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Registrasi & Onboarding
+Calon anggota mengakses halaman **About** untuk memahami profil organisasi. Pengguna kemudian melakukan registrasi dengan menginput data: **Nama Lengkap**, **Tipe Suara (SATB)**, **Email**, dan **Password**. Data ini secara otomatis tersimpan ke dalam tabel profil database Supabase.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Autentikasi Login
+Aplikasi membedakan akses secara otomatis berdasarkan kredensial yang dimasukkan:
 
-## Learn More
+* **Administrator Access:**
+    * **Email:** ziza@choirz.com
+    * **Password:** c1h2o3i4r5@
+    * **Fungsi:** Mengelola data anggota, mengunggah materi lagu, dan melakukan operasi CRUD pada dashboard admin.
 
-To learn more about Next.js, take a look at the following resources:
+* **Member Access:**
+    * **Email:** Menggunakan email personal (contoh: nama@choirz.com).
+    * **Fungsi:** Diarahkan ke dashboard member untuk melihat fitur latihan dan mengakses modul learning sesuai tipe suara masing-masing.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Instalasi Lokal
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Clone repository:
+   git clone [https://github.com/username/choirz.git](https://github.com/username/choirz.git)
 
-## Deploy on Vercel
+2. Install dependencies:
+   npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Konfigurasi Environment Variables di .env.local:
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. Jalankan aplikasi:
+   npm run dev
+
+© 2026 ChoirZ Project — Crafted with Passion by Ziza
