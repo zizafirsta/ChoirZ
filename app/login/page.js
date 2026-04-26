@@ -56,33 +56,49 @@ export default function LoginPage() {
         {/* Dekorasi Aksen Halus */}
         <div className="absolute top-0 left-0 w-full h-2 bg-[#3b82f6]"></div>
 
-{/* Logo & Header */}
-<div className="text-center mb-10">
-  <div className="inline-block mb-6 transition-transform hover:scale-105 duration-300">
-    {/* Coba muat gambar, jika gagal tampilkan teks logo */}
-    <img 
-      src="/logo.png" 
-      alt="ChoirZ" 
-      className="h-20 w-auto mx-auto object-contain"
-      onError={(e) => {
-        e.target.style.display = 'none'; // Sembunyikan gambar jika error
-        e.target.nextSibling.style.display = 'block'; // Munculkan teks cadangan
-      }}
-    />
-    <h1 
-      className="hidden text-4xl font-black tracking-tighter text-blue-600"
-      style={{ display: 'none' }}
-    >
-      ChoirZ
-    </h1>
-  </div>
-  <h1 className="text-2xl font-black tracking-tight text-slate-900 mb-2">
-    Selamat Datang
-  </h1>
-  <p className="text-sm font-medium text-slate-400">
-    Masuk untuk mengakses sistem paduan suara
-  </p>
-</div>
+        {/* Tombol Back */}
+        <button 
+          onClick={() => router.back()}
+          className="absolute top-8 left-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-[#3b82f6] transition-colors group"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-3 w-3 transition-transform group-hover:-translate-x-1" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
+          </svg>
+          Kembali
+        </button>
+
+        {/* Logo & Header */}
+        <div className="text-center mb-10 mt-4"> {/* Ditambah mt-4 agar tidak tabrakan dengan tombol back */}
+          <div className="inline-block mb-6 transition-transform hover:scale-105 duration-300">
+            <img 
+              src="/logo.png" 
+              alt="ChoirZ" 
+              className="h-20 w-auto mx-auto object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+            <h1 
+              className="hidden text-4xl font-black tracking-tighter text-blue-600"
+              style={{ display: 'none' }}
+            >
+              ChoirZ
+            </h1>
+          </div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 mb-2">
+            Selamat Datang
+          </h1>
+          <p className="text-sm font-medium text-slate-400">
+            Masuk untuk mengakses sistem paduan suara
+          </p>
+        </div>
 
         {/* Alert Error Modern */}
         {errorMessage && (
@@ -95,7 +111,6 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleLogin} className="space-y-6">
-          {/* Input Email */}
           <div className="space-y-2">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">
               Email Address
@@ -110,7 +125,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Input Password */}
           <div className="space-y-2">
             <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">
               Password
@@ -125,7 +139,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -149,7 +162,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Footer */}
         <div className="mt-12 text-center">
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
             © 2026 ChoirZ • v1.0 Beta
