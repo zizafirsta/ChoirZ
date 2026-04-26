@@ -365,35 +365,30 @@ function InfoBadge({ icon, text }) {
  * BAGIAN SONG CARD YANG DIPERBAIKI
  */
 function SongCard({ song, voiceType }) {
-  // Normalisasi voiceType agar tidak sensitif huruf besar/kecil
-  const normalizedVoice = voiceType ? voiceType.toLowerCase().trim() : null;
+  // 1. Normalisasi: Ubah ke huruf kecil dan hapus spasi
+  const v = voiceType ? voiceType.toLowerCase().trim() : null;
 
-  // Mapping label tampilan berdasarkan input database
+  // 2. Mapping Label (Untuk tampilan teks di UI)
   const voiceMap = {
-    's': 'Sopran', 
-    'sopran': 'Sopran',
-    'a': 'Alto', 
-    'alto': 'Alto',
-    't': 'Tenor', 
-    'tenor': 'Tenor',
-    'b': 'Bass', 
-    'bass': 'Bass'
+    's': 'Sopran', 'sopran': 'Sopran',
+    'a': 'Alto', 'alto': 'Alto',
+    't': 'Tenor', 'tenor': 'Tenor',
+    'b': 'Bass', 'bass': 'Bass'
   };
 
-  const voiceLabel = voiceMap[normalizedVoice];
+  const voiceLabel = voiceMap[v];
   
-  // Logika pengambilan kunci audio: track_sopran, track_alto, dsb.
-  // Jika database menyimpan 'S', diubah dulu ke 'sopran' untuk memanggil kolom track
-  const getAudioKey = (v) => {
-    if (!v) return null;
-    if (v === 's' || v === 'sopran') return 'track_sopran';
-    if (v === 'a' || v === 'alto') return 'track_alto';
-    if (v === 't' || v === 'tenor') return 'track_tenor';
-    if (v === 'b' || v === 'bass') return 'track_bass';
+  // 3. Mapping Kolom Audio (Menghubungkan S/A/T/B atau nama lengkap ke kolom track_...)
+  const getAudioKey = (val) => {
+    if (!val) return null;
+    if (val === 's' || val === 'sopran') return 'track_sopran';
+    if (val === 'a' || val === 'alto') return 'track_alto';
+    if (val === 't' || val === 'tenor') return 'track_tenor';
+    if (val === 'b' || val === 'bass') return 'track_bass';
     return null;
   };
 
-  const audioKey = getAudioKey(normalizedVoice);
+  const audioKey = getAudioKey(v);
   const audioSrc = audioKey ? song[audioKey] : null;
 
   return (
@@ -421,6 +416,7 @@ function SongCard({ song, voiceType }) {
     </div>
   );
 }
+
 
 function AudioPlayer({ label, src }) {
   if (!src) return (
