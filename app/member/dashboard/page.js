@@ -362,23 +362,32 @@ function InfoBadge({ icon, text }) {
 }
 
 function SongCard({ song, voiceType }) {
-  // 1. Normalisasi: Ambil huruf pertama saja (S/A/T/B) dan jadikan huruf kecil
-  // Ini agar 'sopran' jadi 's', dan 'S' tetap 's'
-  const v = voiceType ? voiceType.toLowerCase().trim().charAt(0) : null;
+  // 1. Normalisasi data dari profil (menghilangkan spasi dan huruf kecil)
+  const rawVoice = voiceType ? voiceType.toLowerCase().trim() : "";
 
-  // 2. Mapping Label untuk tampilan teks UI
-  const voiceMap = {
+  // 2. Mapping Manual: Memastikan input apapun (lengkap/inisial) jadi inisial s/a/t/b
+  const getInitial = (v) => {
+    if (v === 'sopran' || v === 's') return 's';
+    if (v === 'alto' || v === 'a') return 'a';
+    if (v === 'tenor' || v === 't') return 't';
+    if (v === 'bass' || v === 'b') return 'b';
+    return null;
+  };
+
+  const initial = getInitial(rawVoice);
+
+  // 3. Mapping Label Tampilan
+  const voiceLabelMap = {
     's': 'Sopran',
     'a': 'Alto',
     't': 'Tenor',
     'b': 'Bass'
   };
 
-  const voiceLabel = voiceMap[v];
+  const voiceLabel = voiceLabelMap[initial];
   
-  // 3. Menghubungkan ke kolom database: track_s, track_a, track_t, track_b
-  // Pastikan di Supabase nama kolomnya memang track_s, track_a, dst.
-  const audioKey = v ? `track_${v}` : null;
+  // 4. Ambil Source Audio dari kolom track_s, track_a, dst.
+  const audioKey = initial ? `track_${initial}` : null;
   const audioSrc = audioKey ? song[audioKey] : null;
 
   return (
