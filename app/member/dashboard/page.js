@@ -361,34 +361,24 @@ function InfoBadge({ icon, text }) {
   );
 }
 
-/**
- * BAGIAN SONG CARD YANG DIPERBAIKI
- */
 function SongCard({ song, voiceType }) {
-  // 1. Normalisasi: Ubah ke huruf kecil dan hapus spasi
-  const v = voiceType ? voiceType.toLowerCase().trim() : null;
+  // 1. Normalisasi: Ambil huruf pertama saja (S/A/T/B) dan jadikan huruf kecil
+  // Ini agar 'sopran' jadi 's', dan 'S' tetap 's'
+  const v = voiceType ? voiceType.toLowerCase().trim().charAt(0) : null;
 
-  // 2. Mapping Label (Untuk tampilan teks di UI)
+  // 2. Mapping Label untuk tampilan teks UI
   const voiceMap = {
-    's': 'Sopran', 'sopran': 'Sopran',
-    'a': 'Alto', 'alto': 'Alto',
-    't': 'Tenor', 'tenor': 'Tenor',
-    'b': 'Bass', 'bass': 'Bass'
+    's': 'Sopran',
+    'a': 'Alto',
+    't': 'Tenor',
+    'b': 'Bass'
   };
 
   const voiceLabel = voiceMap[v];
   
-  // 3. Mapping Kolom Audio (Menghubungkan S/A/T/B atau nama lengkap ke kolom track_...)
-  const getAudioKey = (val) => {
-    if (!val) return null;
-    if (val === 's' || val === 'sopran') return 'track_sopran';
-    if (val === 'a' || val === 'alto') return 'track_alto';
-    if (val === 't' || val === 'tenor') return 'track_tenor';
-    if (val === 'b' || val === 'bass') return 'track_bass';
-    return null;
-  };
-
-  const audioKey = getAudioKey(v);
+  // 3. Menghubungkan ke kolom database: track_s, track_a, track_t, track_b
+  // Pastikan di Supabase nama kolomnya memang track_s, track_a, dst.
+  const audioKey = v ? `track_${v}` : null;
   const audioSrc = audioKey ? song[audioKey] : null;
 
   return (
